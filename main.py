@@ -1,7 +1,5 @@
-from fastapi import FastAPI, Request, UploadFile, File, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -65,18 +63,18 @@ STOPWORDS = {
     "is","are","be","as","this","that","it","you","we","they","our","their"
 }
 
+# --- normalization/tokenization ---
 def normalize(s: str) -> str:
     s = s.lower()
-    # remove emails/phones/urls to avoid false matches
-    s = re.sub(r"\S+@\S+", " ", s)
-    s = re.sub(r"\b(?:\+?\d[\d\-\s]{7,}\d)\b", " ", s)
-    s = re.sub(r"https?://\S+|www\.\S+", " ", s)
-    s = re.sub(r"[^a-z0-9\+\#\.\s]", " ", s)
+    s = re.sub(r"\S+@\S+", " ", s)                            # emails
+    s = re.sub(r"\b(?:\+?\d[\d\-\s]{7,}\d)\b", " ", s)        # phones
+    s = re.sub(r"https?://\S+|www\.\S+", " ", s)              # urls
+    s = re.sub(r"[^a-z0-9\+\#\.\-\/\s]", " ", s)              # keep + # . - /
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
 def tokenize_words(s: str):
-    return re.findall(r"[a-z0-9\+\#\.]{2,}", s)
+    return re.findall(r"[a-z0-9\+\#\.\-\/]{2,}", s)
 
 def extract_candidate_keywords(jd_text: str) -> list[str]:
     tokens = [t for t in tokenize_words(jd_text) if t not in STOPWORDS]
@@ -86,20 +84,40 @@ def extract_candidate_keywords(jd_text: str) -> list[str]:
     top = sorted(freq.items(), key=lambda x: x[1], reverse=True)[:50]
     return [w for w,_ in top]
 
-def keyword_coverage(resume_text: str, jd_text: str):
+def keyword_match(resume_text: str, jd_text: str):
     jd_keys = extract_candidate_keywords(jd_text)
     resume_tokens = set(tokenize_words(resume_text))
     matched = [k for k in jd_keys if k in resume_tokens]
     coverage = round(len(matched) / max(1, len(jd_keys)), 3)
-    return coverage, matched, [k for k in jd_keys if k not in resume_tokens][:20]
+    # Call the tfidf_cosine function to get the semantic score
+    cosine_similarity_score = tfidf_cosine(resume_text, jd_text)
+    
+    # simple composite: weight semantic higher than coverage
+    overall_score = round(0.65 * cosine_similarity_score + 0.35 * coverage, 3)
 
+    return {
+        "overall_score": overall_score,
+        "cosine_similarity": cosine_similarity_score,
+        "coverage": coverage,
+        "matched": matched,
+        "missing_sample": [k for k in jd_keys if k not in resume_tokens][:20]
+    }
+
+# --- tfidf with guard and matching token pattern ---
 def tfidf_cosine(resume_text: str, jd_text: str) -> float:
-    # ngram_range=(1,2) helps match “data analysis” vs “analysis”
-    vectorizer = TfidfVectorizer(ngram_range=(1,2), min_df=1)
-    X = vectorizer.fit_transform([jd_text, resume_text])
-    # cosine between JD (row 0) and Resume (row 1)
-    cos = cosine_similarity(X[0], X[1])[0][0]
-    return float(round(cos, 3))
+    try:
+        vectorizer = TfidfVectorizer(
+            ngram_range=(1, 2),
+            lowercase=False,                               # already normalized
+            token_pattern=r"[a-z0-9\+\#\.\-\/]{2,}",
+            stop_words=None                                # optional: 'english'
+        )
+        tfidf_matrix = vectorizer.fit_transform([jd_text, resume_text])
+        cos = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+        return float(round(cos, 3))
+    except ValueError:
+        # e.g., empty vocabulary after normalization
+        return 0.0
 
 @app.post("/score")
 async def score(
@@ -113,21 +131,8 @@ async def score(
     resume_text = normalize(resume_raw)
     jd_text = normalize(jd_raw)
 
-    # keyword coverage
-    coverage, matched, missing = keyword_coverage(resume_text, jd_text)
 
-    # tf-idf cosine similarity
-    cosine = tfidf_cosine(resume_text, jd_text)
-
-    # simple composite: weight semantic higher than coverage
-    overall = round(0.65 * cosine + 0.35 * coverage, 3)
-
-    return {
-        "overall_score": overall,
-        "cosine": cosine,
-        "coverage": coverage,
-        "matched_keywords": matched,
-        "missing_keywords_sample": missing,
-        "resume_chars": len(resume_raw),
-        "jd_chars": len(jd_raw)
-    }
+    score_data = keyword_match(resume_text, jd_text)
+    
+    # Return the entire dictionary of scores and data.
+    return score_data
