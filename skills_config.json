@@ -1,0 +1,48 @@
+{
+  "stopwords": [
+    "and","or","the","a","an","to","of","in","for","with","on","at","by","from",
+    "is","are","be","as","this","that","it","you","we","they","our","their"
+  ],
+  "skills": [
+    { "name": "python",        "aliases": ["py"] },
+    { "name": "javascript",    "aliases": ["js","java script"] },
+    { "name": "typescript",    "aliases": ["ts","type script"] },
+    { "name": "java",          "aliases": [] },
+    { "name": "c++",           "aliases": ["cpp"] },
+    { "name": "c#",            "aliases": ["c sharp","c-sharp"] },
+    { "name": "go",            "aliases": ["golang"] },
+    { "name": "sql",           "aliases": [] },
+
+    { "name": "react",         "aliases": ["reactjs","react.js","react js"] },
+    { "name": "angular",       "aliases": ["angularjs","angular.js"] },
+    { "name": "vue",           "aliases": ["vuejs","vue.js","vue js"] },
+    { "name": "fastapi",       "aliases": ["fast api"] },
+    { "name": "django",        "aliases": [] },
+    { "name": "flask",         "aliases": [] },
+    { "name": "express",       "aliases": ["expressjs","express.js"] },
+    { "name": "node.js",       "aliases": ["node","nodejs"] },
+
+    { "name": "tensorflow",    "aliases": ["tf","tensor flow"] },
+    { "name": "pytorch",       "aliases": ["torch"] },
+    { "name": "scikit-learn",  "aliases": ["sklearn","scikit learn"] },
+    { "name": "keras",         "aliases": [] },
+    { "name": "pandas",        "aliases": [] },
+    { "name": "numpy",         "aliases": [] },
+    { "name": "opencv",        "aliases": ["open cv"] },
+
+    { "name": "postgresql",    "aliases": ["postgres","postgre","psql"] },
+    { "name": "mysql",         "aliases": ["my sql"] },
+    { "name": "mongodb",       "aliases": ["mongo","mongo db"] },
+    { "name": "sqlite",        "aliases": ["sqlite3"] },
+    { "name": "redis",         "aliases": [] },
+
+    { "name": "aws",           "aliases": ["amazon web services","ec2","s3","iam","lambda"] },
+    { "name": "gcp",           "aliases": ["google cloud platform","google cloud"] },
+    { "name": "azure",         "aliases": ["microsoft azure","azure cloud"] },
+    { "name": "docker",        "aliases": [] },
+    { "name": "kubernetes",    "aliases": ["k8s"] },
+    { "name": "ci/cd",         "aliases": ["continuous integration","continuous deployment"] },
+    { "name": "git",           "aliases": ["git version control"] },
+    { "name": "linux",         "aliases": ["unix","gnu linux"] }
+  ]
+}
