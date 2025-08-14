@@ -46,3 +46,9 @@ jobs:
       - name: Run lint
         working-directory: smart-resume-ui
         run: npm run lint
+      - name: Build (prod)
+        working-directory: smart-resume-ui
+        env:
+          VITE_API_BASE_URL: http://127.0.0.1:8000
+        run: npm run build
+

@@ -14,9 +14,14 @@ export default function App() {
   const [loadingAnalyze, setLoadingAnalyze] = useState(false);
   const [loadingScore, setLoadingScore] = useState(false);
   const [error, setError] = useState("");
+  const [resetTrigger, setResetTrigger] = useState(false);
+
+  // Enable only after a run (analyze or score) AND files selected
+  const canDownload = Boolean(resume && jd && (score || analyze));
+  const downloadPayload = score ?? analyze; // prefer score JSON if available
 
   const canRun = resume && jd;
-
+    
   async function onAnalyze() {
     setError(""); setAnalyze(null); setLoadingAnalyze(true);
     try {
@@ -44,16 +49,20 @@ export default function App() {
   return (
     <div className="page">
       <h1>Smart Resume Analyzer</h1>
+      
+
       <div className="grid">
         <FileDrop
           label="Resume (.pdf / .txt / .docx)"
           accept=".pdf,.txt,.docx"
           onFile={setResume}
+          reset={resetTrigger}  
         />
         <FileDrop
           label="Job Description (.pdf / .txt / .docx)"
           accept=".pdf,.txt,.docx"
           onFile={setJd}
+          reset={resetTrigger}  
         />
       </div>
 
@@ -120,6 +129,44 @@ export default function App() {
           </div>
         </div>
       )}
+        <div>
+            <button
+                disabled={!canDownload}
+                onClick={() => {
+                    if (!downloadPayload) return;
+                    const blob = new Blob([JSON.stringify(downloadPayload, null, 2)], { type: "application/json" });
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = score ? "resume-score.json" : "resume-analyze.json";
+                    a.click();
+                }} >
+                Download report
+            </button> 
+            
+    
+           <button
+                style={{
+                    backgroundColor: resume || jd ? "#BA3D25" : "#023E8A", // orange if enabled, grey if disabled
+                    color: "white",
+                    cursor: resume || jd ? "pointer" : "not-allowed",
+                    padding: "0.5rem 1rem ",
+                    margin:10  ,
+                    border: "none",
+                    borderRadius: "6px"
+                }}
+                disabled={!resume && !jd}
+                onClick={() => {
+                    setResume(null);
+                    setJd(null);
+                    setAnalyze(null);
+                    setScore(null);
+                    setResetTrigger((v) => !v);
+                }}
+                >
+                Reset
+            </button>
+        </div>
+      
 
       <footer>
         API: {import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"}
