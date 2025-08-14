@@ -12,6 +12,7 @@ Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and s
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
+<img width="1032" height="847" alt="UI example" src="https://github.com/user-attachments/assets/feabe0c3-8364-4dfa-81a0-1342c32a11b2" />
 
 ### Frontend
 1. Install Node.js 18+.
@@ -49,3 +50,6 @@ The build output is written to `smart-resume-ui/dist`. You can preview the produ
 ```bash
 npm run preview
 ```
+
+
+
