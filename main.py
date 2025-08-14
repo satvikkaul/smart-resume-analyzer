@@ -228,6 +228,15 @@ def keyword_match(resume_text: str, jd_text: str) -> Dict:
 # --------------------------------------------------------------------------------------
 # Endpoints
 # --------------------------------------------------------------------------------------
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+APP_VERSION = "v0.1.0"  # bump on release
+@app.get("/version")
+def version():
+    return {"version": APP_VERSION}
+
 @app.post("/analyze")
 async def analyze_files(
     resume: UploadFile = File(...),
