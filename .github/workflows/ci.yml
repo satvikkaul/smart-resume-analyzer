@@ -13,17 +13,22 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: requirements.txt   # ensure cache invalidates
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+          python -m pip install httpx              
 
-      - name: Verify pytest installed
-        run: python -c "import pytest,sys; print('pytest', pytest.__version__, sys.executable)"
+      - name: Verify libs
+        run: |
+          python -c "import pytest, sys; print('pytest:', pytest.__version__); print(sys.executable)"
+          python -c "import httpx; print('httpx:', httpx.__version__)"
 
       - name: Run tests
         run: python -m pytest -q
+
 
 
   frontend-lint:
