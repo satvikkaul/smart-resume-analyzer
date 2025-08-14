@@ -99,7 +99,7 @@ async def extract_text(file: UploadFile) -> str:
     if name.endswith(".txt"):
         return data.decode("utf-8", errors="ignore")
 
-    # .pdf
+   # .pdf
     if name.endswith(".pdf"):
         try:
             with fitz.open(stream=data, filetype="pdf") as doc:
@@ -108,10 +108,39 @@ async def extract_text(file: UploadFile) -> str:
                         doc.authenticate("")
                     except Exception:
                         raise HTTPException(status_code=400, detail="Encrypted PDF not supported")
-                text_chunks = [page.get_text("text") for page in doc]
+
+                texts = []
+                for page in doc:
+                    txt = None
+                    # Preferred path on modern PyMuPDF (>=1.18, incl. 1.24.x)
+                    try:
+                        txt = page.get_text()                 # type: ignore # defaults to "text"
+                    except AttributeError:
+                        pass
+
+                    # Fallbacks if stubs/env mismatch
+                    if not txt:
+                        try:
+                            txt = page.get_text("text") # type: ignore
+                        except Exception:
+                            try:
+                                tp = page.get_textpage()
+                                try:
+                                    txt = tp.extract_text()   # type: ignore # new snake_case
+                                except AttributeError:
+                                    txt = tp.extractText()    # legacy camelCase
+                            except Exception:
+                                txt = ""
+
+                    if txt and txt.strip():
+                        texts.append(txt)
+
         except (fitz.FileDataError, RuntimeError):
             raise HTTPException(status_code=400, detail="Invalid or unreadable PDF")
-        return "\n".join(t for t in text_chunks if t and t.strip())
+
+        return "\n".join(texts)
+
+
 
     # .docx
     if name.endswith(".docx"):
@@ -197,7 +226,7 @@ def tfidf_cosine_lexicon(resume_text: str, jd_text: str) -> float:
             sublinear_tf=True,
         )
         X = vectorizer.fit_transform([jd_text, resume_text])
-        cos = cosine_similarity(X[0], X[1])[0][0]
+        cos = cosine_similarity(X[0], X[1])[0][0] # type: ignore
         return float(round(cos, 3))
     except ValueError:
         return 0.0
