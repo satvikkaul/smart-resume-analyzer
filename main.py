@@ -99,7 +99,7 @@ async def extract_text(file: UploadFile) -> str:
     if name.endswith(".txt"):
         return data.decode("utf-8", errors="ignore")
 
-   # .pdf
+    # .pdf
     if name.endswith(".pdf"):
         try:
             with fitz.open(stream=data, filetype="pdf") as doc:
@@ -111,35 +111,30 @@ async def extract_text(file: UploadFile) -> str:
 
                 texts = []
                 for page in doc:
-                    txt = None
-                    # Preferred path on modern PyMuPDF (>=1.18, incl. 1.24.x)
+                    # Primary path for modern PyMuPDF
                     try:
-                        txt = page.get_text()                 # type: ignore # defaults to "text"
+                        txt = page.get_text() # type: ignore
                     except AttributeError:
-                        pass
-
-                    # Fallbacks if stubs/env mismatch
-                    if not txt:
+                        # Fallbacks (older stubs/envs)
                         try:
                             txt = page.get_text("text") # type: ignore
                         except Exception:
-                            try:
-                                tp = page.get_textpage()
-                                try:
-                                    txt = tp.extract_text()   # type: ignore # new snake_case
-                                except AttributeError:
-                                    txt = tp.extractText()    # legacy camelCase
-                            except Exception:
-                                txt = ""
+                            tp = page.get_textpage()
+                            txt = getattr(tp, "extract_text", getattr(tp, "extractText"))()
 
                     if txt and txt.strip():
                         texts.append(txt)
 
-        except (fitz.FileDataError, RuntimeError):
+        except Exception:
+            # Covers FzErrorFormat and other MuPDF exceptions
             raise HTTPException(status_code=400, detail="Invalid or unreadable PDF")
 
-        return "\n".join(texts)
-
+        result = "\n".join(texts)
+        if not result.strip():
+            # Optional: scanned PDFs with no text layer
+            # raise HTTPException(status_code=422, detail="PDF has no extractable text")
+            pass
+        return result
 
 
     # .docx
