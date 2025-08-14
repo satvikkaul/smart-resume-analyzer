@@ -2,7 +2,7 @@ import { useState } from "react";
 import FileDrop from "./components/FileDrop.jsx";
 import MetricBar from "./components/MetricBar.jsx";
 import { analyzeFiles, scoreFiles } from "./api.js";
-import "./app.css";
+import "./App.css";
 
 export default function App() {
   const [resume, setResume] = useState(null);
