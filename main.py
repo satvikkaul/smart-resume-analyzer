@@ -21,14 +21,17 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Enable CORS for local React dev (adjust as needed)
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://<your-frontend-domain>"   # set after deploy
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # --------------------------------------------------------------------------------------
 # Config / constants
 # --------------------------------------------------------------------------------------
