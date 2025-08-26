@@ -23,7 +23,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Enable CORS for local React dev (adjust as needed)
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://<your-frontend-domain>"   # set after deploy
+    "https://job-fit-analyzer.netlify.app"   # set after deploy
 ]
 app.add_middleware(
     CORSMiddleware,
