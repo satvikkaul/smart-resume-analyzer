@@ -1,6 +1,12 @@
 # Smart Resume Analyzer
 
-Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and suggests actionable rewrites using rule‑based NLP with optional LLM support.
+👉 **[Live Demo – Frontend UI](https://job-fit-analyzer.netlify.app/)**  
+👉 **[Backend API Docs](https://smart-resume-analyzer-2nwb.onrender.com/docs)**  
+
+Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and suggests actionable rewrites using rule-based NLP with optional LLM support.
+
+## Score Endpoint 
+<img width="722" height="593" alt="UI example" src="./smart-resume-ui/src/assets/image2.png" />
 
 ## Setup
 
@@ -12,8 +18,6 @@ Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and s
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
-<img width="722" height="593" alt="UI example" src="https://github.com/user-attachments/assets/feabe0c3-8364-4dfa-81a0-1342c32a11b2" />
-
 ### Frontend
 1. Install Node.js 18+.
 2. From the project root, install dependencies for the UI:
@@ -37,7 +41,7 @@ Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and s
   cd smart-resume-ui
   npm run dev
   ```
-  The app will be available at `http://localhost:5173` and will use `VITE_API_BASE_URL` for API requests.
+  The app will be available at `https://smart-resume-analyzer-2nwb.onrender.com` and will use `VITE_API_BASE_URL` for API requests.
 
 ## Build
 
