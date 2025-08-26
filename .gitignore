@@ -7,7 +7,8 @@ __pycache__/
 # Virtual env
 venv/
 ENV/
-.env/
+.env
+smart-resume-ui/.env
 env/
 
 # VS Code
