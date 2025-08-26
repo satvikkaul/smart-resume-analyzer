@@ -6,7 +6,7 @@
 Smart Resume Analyzer matches resumes to job descriptions, evaluates tone, and suggests actionable rewrites using rule-based NLP with optional LLM support.
 
 ## Score Endpoint 
-<img width="722" height="593" alt="UI example" src="./smart-resume-ui/src/assets/image2.png" />
+<img width="722" height="593" alt="UI example" src="./smart-resume-ui/src/assets/image.png" />
 
 ## Setup
 
